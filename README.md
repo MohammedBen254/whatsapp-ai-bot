@@ -1,11 +1,11 @@
 # WhatsApp AI Bot
 
-A WhatsApp bot that uses **JavaScript (Baileys)** for WhatsApp connection and **Python (FastAPI + Gemini AI)** for intelligent responses.
+A WhatsApp bot that uses **JavaScript (Baileys)** for WhatsApp connection and **Python (FastAPI + OpenRouter AI)** for intelligent responses.
 
 ## Architecture
 
 ```
-User Message -> WhatsApp -> Baileys (JS) -> FastAPI (Python) -> Gemini AI -> Reply -> WhatsApp -> User
+User Message -> WhatsApp -> Baileys (JS) -> FastAPI (Python) -> OpenRouter AI -> Reply -> WhatsApp -> User
 ```
 
 ## Prerequisites
@@ -34,13 +34,22 @@ pip install -r requirements.txt
 
 ### 3. Configure Environment
 
-Edit `.env` file and add your Gemini API key:
+Copy `.env.example` to `.env` and add your OpenRouter API key:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` file:
 
 ```
-GEMINI_API_KEY=your_api_key_here
+OPENROUTER_API_KEY=your_api_key_here
+PYTHON_API_URL=http://127.0.0.1:5000
+PORT=3000
+BOT_PERSONALITY=You are a helpful and friendly WhatsApp assistant.
 ```
 
-Get your API key from: https://aistudio.google.com/app/apikey
+Get your API key from: https://openrouter.ai/keys
 
 ## Running the Bot
 
@@ -95,14 +104,18 @@ start.bat
 
 ```
 whatsapp-bot-implemented/
-├── index.js                 # Main JavaScript bot (Baileys + Express)
-├── package.json             # Node.js dependencies
-├── .env                     # Environment variables
+├── index.js                      # Main JavaScript bot (Baileys + Express)
+├── package.json                  # Node.js dependencies
+├── start.bat                     # Windows startup script
+├── .env.example                  # Environment variables template
+├── .gitignore                    # Git ignore rules
+├── public/                       # Static files (QR code images)
+├── auth_info/                    # WhatsApp session data (gitignored)
 ├── python/
-│   ├── main.py              # FastAPI server
-│   ├── gemini_client.py     # Gemini AI integration
-│   ├── conversation_manager.py  # Conversation history manager
-│   └── requirements.txt     # Python dependencies
+│   ├── main.py                   # FastAPI server
+│   ├── gemini_client.py          # OpenRouter AI integration
+│   ├── conversation_manager.py   # Conversation history manager
+│   └── requirements.txt          # Python dependencies
 └── README.md
 ```
 
@@ -110,7 +123,7 @@ whatsapp-bot-implemented/
 
 - QR code authentication
 - Multi-user conversation tracking
-- AI-powered responses with Gemini
+- AI-powered responses via OpenRouter (supports multiple models)
 - Conversation history persistence
 - REST API for manual messaging
 - Web dashboard for monitoring

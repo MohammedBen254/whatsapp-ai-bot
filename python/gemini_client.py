@@ -16,7 +16,7 @@ class GeminiClient:
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key,
         )
-        self.model_name = "deepseek/deepseek-v4-flash:free"
+        self.model_name = "nvidia/nemotron-3-super-120b-a12b:free"
         self.chat_sessions = {}
 
     async def generate_response(self, sender_id: str, message: str, personality: str, history: list) -> str:

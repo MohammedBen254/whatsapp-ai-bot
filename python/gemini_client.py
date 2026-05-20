@@ -19,7 +19,7 @@ class GeminiClient:
         self.model_name = "nvidia/nemotron-3-super-120b-a12b:free"
         self.chat_sessions = {}
 
-    async def generate_response(self, sender_id: str, message: str, personality: str, history: list) -> str:
+    async def generate_response(self, sender_id: str, message: str, personality: str, history: list, knowledge_context: str = "") -> str:
         try:
             system_prompt = f"""{personality}
 
@@ -29,7 +29,26 @@ You are responding to WhatsApp messages. Keep your responses:
 - Contextually relevant based on conversation history
 - Use simple formatting (avoid complex markdown)
 
+IMPORTANT: ALWAYS respond in the SAME LANGUAGE as the user's message.
+- If the user writes in French, respond in French
+- If the user writes in Arabic, respond in Arabic
+- If the user writes in English, respond in English
+- Match the user's language exactly
+
 Respond directly to the user's latest message."""
+
+            if knowledge_context:
+                system_prompt += f"""
+
+IMPORTANT - KNOWLEDGE BASE (use this as your PRIMARY source of truth):
+{knowledge_context}
+
+RULES:
+1. ALWAYS prioritize the knowledge base above your general knowledge
+2. If the knowledge base contains information about the user's question, answer using ONLY that information
+3. Do NOT say "I'm not familiar with" if the knowledge base covers the topic
+4. Keep responses concise and natural for WhatsApp
+5. If the knowledge base doesn't cover the topic, then use your general knowledge"""
 
             messages = [{"role": "system", "content": system_prompt}]
 

@@ -79,6 +79,16 @@ start.bat
 2. Scan the QR code with WhatsApp (Linked Devices)
 3. Bot is now active and will respond to messages
 
+### Knowledge Base Management
+
+Access the knowledge base web interface at: http://localhost:5000/knowledge-ui
+
+You can:
+- Add new knowledge entries with title, content, and tags
+- Search and filter existing entries
+- Edit or delete entries
+- View statistics about your knowledge base
+
 ## API Endpoints
 
 ### JavaScript Server (Port 3000)
@@ -95,10 +105,17 @@ start.bat
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/` | API status |
+| GET | `/knowledge-ui` | Knowledge base web interface |
 | POST | `/reply` | Get AI response for a message |
 | GET | `/conversation/{id}` | Get conversation history |
 | DELETE | `/conversation/{id}` | Clear conversation history |
 | GET | `/status` | AI service status |
+| POST | `/knowledge` | Add knowledge entry |
+| GET | `/knowledge` | List all knowledge entries |
+| GET | `/knowledge/{id}` | Get specific knowledge entry |
+| DELETE | `/knowledge/{id}` | Delete knowledge entry |
+| POST | `/knowledge/search` | Search knowledge entries |
+| DELETE | `/knowledge` | Clear all knowledge entries |
 
 ## Project Structure
 
@@ -109,12 +126,15 @@ whatsapp-bot-implemented/
 ├── start.bat                     # Windows startup script
 ├── .env.example                  # Environment variables template
 ├── .gitignore                    # Git ignore rules
-├── public/                       # Static files (QR code images)
+├── public/                       # Static files (QR code images, web UI)
+│   └── knowledge.html            # Knowledge base management interface
 ├── auth_info/                    # WhatsApp session data (gitignored)
+├── knowledge_base.json           # Knowledge base storage (gitignored)
 ├── python/
 │   ├── main.py                   # FastAPI server
 │   ├── gemini_client.py          # OpenRouter AI integration
 │   ├── conversation_manager.py   # Conversation history manager
+│   ├── knowledge_base.py         # Knowledge base manager
 │   └── requirements.txt          # Python dependencies
 └── README.md
 ```
@@ -124,6 +144,7 @@ whatsapp-bot-implemented/
 - QR code authentication
 - Multi-user conversation tracking
 - AI-powered responses via OpenRouter (supports multiple models)
+- Knowledge base with web management interface
 - Conversation history persistence
 - REST API for manual messaging
 - Web dashboard for monitoring

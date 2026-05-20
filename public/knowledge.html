@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Base Manager</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; }
+        .header { background: linear-gradient(135deg, #25D366, #128C7E); color: white; padding: 1.5rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 1.8rem; }
+        .header p { opacity: 0.9; margin-top: 0.5rem; }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; }
+        .stat-card h3 { font-size: 2rem; color: #128C7E; }
+        .stat-card p { color: #666; margin-top: 0.5rem; }
+        .main-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
+        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
+        .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 1.5rem; }
+        .card h2 { margin-bottom: 1rem; color: #128C7E; font-size: 1.2rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #555; }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #25D366; }
+        .form-group textarea { min-height: 120px; resize: vertical; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #25D366; color: white; }
+        .btn-primary:hover { background: #128C7E; }
+        .btn-danger { background: #ff6b6b; color: white; }
+        .btn-danger:hover { background: #ee5a5a; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+        .search-box { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .search-box input { flex: 1; }
+        .entries-list { max-height: 600px; overflow-y: auto; }
+        .entry-item { border: 1px solid #eee; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; transition: box-shadow 0.2s; }
+        .entry-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .entry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .entry-title { font-weight: 600; color: #333; }
+        .entry-actions { display: flex; gap: 0.5rem; }
+        .entry-content { color: #666; font-size: 0.9rem; white-space: pre-wrap; max-height: 100px; overflow: hidden; }
+        .entry-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+        .tag { background: #e8f5e9; color: #128C7E; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; }
+        .entry-date { font-size: 0.75rem; color: #999; margin-top: 0.5rem; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 1rem 1.5rem; border-radius: 8px; color: white; z-index: 2000; animation: slideIn 0.3s ease; }
+        .toast.success { background: #25D366; }
+        .toast.error { background: #ff6b6b; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .empty-state { text-align: center; padding: 3rem; color: #999; }
+        .empty-state svg { width: 80px; height: 80px; margin-bottom: 1rem; opacity: 0.5; }
+        .loading { display: inline-block; width: 20px; height: 20px; border: 2px solid #fff; border-radius: 50%; border-top-color: transparent; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Knowledge Base Manager</h1>
+        <p>Manage your WhatsApp AI bot's knowledge base</p>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="entryCount">0</h3>
+                <p>Total Entries</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="tagCount">0</h3>
+                <p>Unique Tags</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="lastUpdated">-</h3>
+                <p>Last Updated</p>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <h2>Add New Entry</h2>
+                <form id="addForm">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" placeholder="Entry title..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="content">Content</label>
+                        <textarea id="content" placeholder="Knowledge content..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="tags">Tags (comma separated)</label>
+                        <input type="text" id="tags" placeholder="e.g., pricing, support, hours">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Add Entry</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Knowledge Entries</h2>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search entries...">
+                    <button onclick="searchEntries()" class="btn btn-secondary">Search</button>
+                    <button onclick="loadEntries()" class="btn btn-secondary">Refresh</button>
+                </div>
+                <div id="entriesList" class="entries-list">
+                    <div class="empty-state">
+                        <p>Loading entries...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Entry</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label for="editTitle">Title</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="editContent">Content</label>
+                    <textarea id="editContent" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editTags">Tags (comma separated)</label>
+                    <input type="text" id="editTags">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        async function loadEntries() {
+            try {
+                const res = await fetch(`${API_URL}/knowledge`);
+                const data = await res.json();
+                renderEntries(data.entries);
+                updateStats(data.entries);
+            } catch (err) {
+                showToast('Failed to load entries', 'error');
+            }
+        }
+
+        function renderEntries(entries) {
+            const container = document.getElementById('entriesList');
+            if (!entries || entries.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No entries yet. Add your first knowledge entry!</p></div>';
+                return;
+            }
+
+            container.innerHTML = entries.map(entry => `
+                <div class="entry-item">
+                    <div class="entry-header">
+                        <span class="entry-title">${escapeHtml(entry.title)}</span>
+                        <div class="entry-actions">
+                            <button onclick="openEditModal(${entry.id})" class="btn btn-secondary btn-sm">Edit</button>
+                            <button onclick="deleteEntry(${entry.id})" class="btn btn-danger btn-sm">Delete</button>
+                        </div>
+                    </div>
+                    <div class="entry-content">${escapeHtml(entry.content)}</div>
+                    ${entry.tags && entry.tags.length > 0 ? `
+                        <div class="entry-tags">
+                            ${entry.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="entry-date">Created: ${new Date(entry.created_at).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats(entries) {
+            document.getElementById('entryCount').textContent = entries.length;
+            const allTags = new Set();
+            entries.forEach(e => (e.tags || []).forEach(t => allTags.add(t)));
+            document.getElementById('tagCount').textContent = allTags.size;
+            document.getElementById('lastUpdated').textContent = entries.length > 0
+                ? new Date(entries[entries.length - 1].created_at).toLocaleDateString()
+                : '-';
+        }
+
+        document.getElementById('addForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const tags = document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t);
+
+            try {
+                const res = await fetch(`${API_URL}/knowledge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content, tags })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Entry added successfully', 'success');
+                    document.getElementById('addForm').reset();
+                    loadEntries();
+                }
+            } catch (err) {
+                showToast('Failed to add entry', 'error');
+            }
+        });
+
+        async function deleteEntry(id) {
+            if (!confirm('Delete this entry?')) return;
+            try {
+                const res = await fetch(`${API_URL}/knowledge/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Entry deleted', 'success');
+                    loadEntries();
+                }
+            } catch (err) {
+                showToast('Failed to delete entry', 'error');
+            }
+        }
+
+        function openEditModal(id) {
+            fetch(`${API_URL}/knowledge/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    const entry = data.entry;
+                    document.getElementById('editId').value = entry.id;
+                    document.getElementById('editTitle').value = entry.title;
+                    document.getElementById('editContent').value = entry.content;
+                    document.getElementById('editTags').value = (entry.tags || []).join(', ');
+                    document.getElementById('editModal').classList.add('active');
+                });
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const title = document.getElementById('editTitle').value;
+            const content = document.getElementById('editContent').value;
+            const tags = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(t => t);
+
+            try {
+                await fetch(`${API_URL}/knowledge/${id}`, { method: 'DELETE' });
+                const res = await fetch(`${API_URL}/knowledge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content, tags })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Entry updated', 'success');
+                    closeModal();
+                    loadEntries();
+                }
+            } catch (err) {
+                showToast('Failed to update entry', 'error');
+            }
+        });
+
+        async function searchEntries() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) {
+                loadEntries();
+                return;
+            }
+            try {
+                const res = await fetch(`${API_URL}/knowledge/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query, limit: 50 })
+                });
+                const data = await res.json();
+                renderEntries(data.results);
+            } catch (err) {
+                showToast('Search failed', 'error');
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchEntries();
+        });
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.addEventListener('DOMContentLoaded', loadEntries);
+    </script>
+</body>
+</html>

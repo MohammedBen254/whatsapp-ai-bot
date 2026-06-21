@@ -54,3 +54,5 @@ python/.ruff_cache/
 # Misc
 .sixth/
 conversations.json
+
+.venv

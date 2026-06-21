@@ -8,7 +8,12 @@ from knowledge_base import KnowledgeBase
 import logging
 import os
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="WhatsApp AI API")
 
@@ -80,7 +85,7 @@ async def reply(request: MessageRequest):
 
         return MessageResponse(reply=ai_response)
     except Exception as e:
-        logging.error(f"Error generating response: {e}")
+        logger.error("Error generating response: %s", e)
         return MessageResponse(reply="Sorry, I am having trouble processing your message. Please try again later.")
 
 

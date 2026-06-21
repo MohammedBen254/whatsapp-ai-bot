@@ -1,6 +1,9 @@
 import json
+import logging
 import os
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 
 class KnowledgeBase:
@@ -16,7 +19,7 @@ class KnowledgeBase:
                 with open(self.storage_file, 'r', encoding='utf-8') as f:
                     return json.load(f)
         except Exception as e:
-            print(f"Error loading knowledge base: {e}")
+            logger.error("Error loading knowledge base: %s", e)
         return {"entries": []}
 
     def _save(self):
@@ -24,7 +27,7 @@ class KnowledgeBase:
             with open(self.storage_file, 'w', encoding='utf-8') as f:
                 json.dump(self.entries, f, indent=2, ensure_ascii=False)
         except Exception as e:
-            print(f"Error saving knowledge base: {e}")
+            logger.error("Error saving knowledge base: %s", e)
 
     def add_entry(self, title: str, content: str, tags: list = None) -> dict:
         entry = {

@@ -7,7 +7,7 @@ echo.
 cd /d "%~dp0"
 
 echo [1/2] Starting Python API Server...
-start "Python API" cmd /k "cd python && .venv\Scripts\activate && python main.py"
+start "Python API" cmd /k "cd python && uv run python main.py"
 
 timeout /t 3 /nobreak >nul
 

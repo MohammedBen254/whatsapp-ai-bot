@@ -1,6 +1,9 @@
 import json
+import logging
 import os
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 
 class ConversationManager:
@@ -16,7 +19,7 @@ class ConversationManager:
                 with open(self.storage_file, 'r', encoding='utf-8') as f:
                     return json.load(f)
         except Exception as e:
-            print(f"Error loading conversations: {e}")
+            logger.error("Error loading conversations: %s", e)
         return {}
 
     def _save(self):
@@ -24,7 +27,7 @@ class ConversationManager:
             with open(self.storage_file, 'w', encoding='utf-8') as f:
                 json.dump(self.conversations, f, indent=2, ensure_ascii=False)
         except Exception as e:
-            print(f"Error saving conversations: {e}")
+            logger.error("Error saving conversations: %s", e)
 
     def add_message(self, sender_id: str, role: str, content: str):
         if sender_id not in self.conversations:

@@ -1,6 +1,10 @@
+import logging
 import os
+
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 
 class GeminiClient:
@@ -16,8 +20,7 @@ class GeminiClient:
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key,
         )
-        self.model_name = "nvidia/nemotron-3-super-120b-a12b:free"
-        self.chat_sessions = {}
+        self.model_name = os.getenv("LLM_MODEL", "nvidia/nemotron-3-super-120b:free")
 
     async def generate_response(self, sender_id: str, message: str, personality: str, history: list, knowledge_context: str = "") -> str:
         try:
@@ -65,5 +68,5 @@ RULES:
 
             return response.choices[0].message.content.strip()
         except Exception as e:
-            print(f"OpenRouter API error: {e}")
+            logger.error("OpenRouter API error: %s", e)
             return "I apologize, but I'm having trouble processing your message right now. Please try again later."

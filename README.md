@@ -58,18 +58,13 @@
 # Install Node.js dependencies
 npm install
 
-# Setup Python virtual environment
+# Setup Python virtual environment and install packages (using uv)
 cd python
-python -m venv .venv
-
-# Activate virtual environment
-.venv\Scripts\activate   # Windows
-source .venv/bin/activate  # Linux/Mac
-
-# Install Python packages
-pip install -r requirements.txt
+uv sync
 cd ..
 ```
+
+> **Note:** [uv](https://docs.astral.sh/uv/) is used for Python dependency management. Install it with `pip install uv` or see the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/).
 
 ### 2️⃣ Configure Environment
 
@@ -103,8 +98,7 @@ KNOWLEDGE_BASE_ENABLED=true
 ```bash
 # Terminal 1 — Python API Server
 cd python
-.venv\Scripts\activate
-python main.py
+uv run python main.py
 
 # Terminal 2 — WhatsApp Bot
 npm start
@@ -173,7 +167,8 @@ whatsapp-bot-implemented/
 │   ├── gemini_client.py          # OpenRouter AI integration
 │   ├── conversation_manager.py   # Conversation history manager
 │   ├── knowledge_base.py         # Knowledge base manager
-│   └── requirements.txt          # Python dependencies
+│   ├── pyproject.toml            # Python project config & dependencies
+│   └── uv.lock                   # Locked dependency versions
 └── README.md                     # You are here
 ```
 

@@ -72,24 +72,7 @@ cd ..
 cp .env.example .env
 ```
 
-Edit `.env` with your configuration:
-
-```env
-# Python API configuration
-PYTHON_API_URL=http://127.0.0.1:5000
-
-# Server configuration
-PORT=3000
-
-# OpenRouter API Key (Get yours: https://openrouter.ai/keys)
-OPENROUTER_API_KEY=your_openrouter_api_key
-
-# Bot personality
-BOT_PERSONALITY=You are a helpful and friendly WhatsApp assistant.
-
-# Knowledge Base
-KNOWLEDGE_BASE_ENABLED=true
-```
+Edit `.env` with your configuration.
 
 ### 3️⃣ Run the Bot
 

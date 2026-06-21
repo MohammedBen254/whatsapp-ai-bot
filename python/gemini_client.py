@@ -20,7 +20,7 @@ class GeminiClient:
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key,
         )
-        self.model_name = os.getenv("LLM_MODEL", "nvidia/nemotron-3-super-120b:free")
+        self.model_name = os.getenv("LLM_MODEL", "google/gemma-4-31b-it:free")
 
     async def generate_response(self, sender_id: str, message: str, personality: str, history: list, knowledge_context: str = "") -> str:
         try:
